@@ -2,6 +2,8 @@
 #include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/filestream/jsonOfstream.hpp>
 #include <openpose/filestream/fileStream.hpp>
+#include "iostream"
+#include "zip.h"
 
 namespace op
 {
@@ -70,21 +72,24 @@ namespace op
 
     void saveData(const std::vector<cv::Mat>& cvMats, const std::vector<std::string>& cvMatNames, const std::string& fileNameNoExtension, const DataFormat format)
     {
+        
         try
         {
+            // std::cout<<fileNameNoExtension.c_str()<<std::endl;
             if (format == DataFormat::Json && CV_MAJOR_VERSION < 3)
                 error(errorMessage, __LINE__, __FUNCTION__, __FILE__);
             if (cvMats.size() != cvMatNames.size())
                 error("cvMats.size() != cvMatNames.size()", __LINE__, __FUNCTION__, __FILE__);
-
             cv::FileStorage fileStorage{getFullName(fileNameNoExtension, format), cv::FileStorage::WRITE};
+            mkdirForFile(getFullName(fileNameNoExtension, format));
             for (auto i = 0 ; i < cvMats.size() ; i++)
                 fileStorage << cvMatNames[i] << cvMats[i];
             fileStorage.release();
         }
         catch (const std::exception& e)
         {
-            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+            // dont do anything
+            // error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
 
@@ -191,12 +196,65 @@ namespace op
         }
     }
 
-    void saveImage(const cv::Mat& cvMat, const std::string& fullFilePath, const std::vector<int>& openCvCompressionParams)
+    void saveImageZip(const cv::Mat& cvMat, const std::string& fullFilePath, std::string zipName, const std::vector<int>& openCvCompressionParams)
     {
         try
         {
-            if (!cv::imwrite(fullFilePath, cvMat, openCvCompressionParams))
-                error("Image could not be saved on " + fullFilePath + ".", __LINE__, __FUNCTION__, __FILE__);
+            int sep_index = mkdirForFile(fullFilePath);
+            std::string folderPath = fullFilePath.substr(0,sep_index);
+            std::string fileName = fullFilePath.substr(sep_index+1,fullFilePath.size());
+            std::string zipPath = folderPath + "/" + zipName + ".zip";
+            std::string extention = fileName.substr(fileName.rfind("."));
+            int err =0; 
+
+            struct zip* archive = zip_open(zipPath.c_str(), ZIP_CREATE, &err);
+            struct zip_source *src_ptr;
+            std::vector<uchar> buf;
+            imencode(extention, cvMat, buf);
+            
+            if((src_ptr = zip_source_buffer(archive, buf.data(), buf.size(), 0))==NULL||
+            zip_file_add(archive, fileName.c_str(), src_ptr,ZIP_FL_ENC_UTF_8)<0){
+                zip_source_free(src_ptr);
+                error("Zip file can not add " + fullFilePath + ".", __LINE__, __FUNCTION__, __FILE__);
+            }
+
+            zip_close(archive);
+
+            // if (!cv::imwrite(fullFilePath, cvMat, openCvCompressionParams))
+            //     error("Image could not be saved on " + fullFilePath + ".", __LINE__, __FUNCTION__, __FILE__);
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+    void saveImage(const cv::Mat& cvMat, const std::string& fullFilePath, std::string zipName, const std::vector<int>& openCvCompressionParams)
+    {
+        try
+        {
+            int sep_index = mkdirForFile(fullFilePath);
+            std::string folderPath = fullFilePath.substr(0,sep_index);
+            std::string fileName = fullFilePath.substr(sep_index+1,fullFilePath.size());
+            std::string zipPath = folderPath + "/" + zipName + ".zip";
+            std::string extention = fileName.substr(fileName.rfind("."));
+            int err =0; 
+
+            struct zip* archive = zip_open(zipPath.c_str(), ZIP_CREATE, &err);
+            struct zip_source *src_ptr;
+            std::vector<uchar> buf;
+            imencode(extention, cvMat, buf);
+            
+            if((src_ptr = zip_source_buffer(archive, buf.data(), buf.size(), 0))==NULL||
+            zip_file_add(archive, fileName.c_str(), src_ptr,ZIP_FL_ENC_UTF_8)<0){
+                zip_source_free(src_ptr);
+                error("Zip file can not add " + fullFilePath + ".", __LINE__, __FUNCTION__, __FILE__);
+            }
+
+            zip_close(archive);
+
+            // if (!cv::imwrite(fullFilePath, cvMat, openCvCompressionParams))
+            //     error("Image could not be saved on " + fullFilePath + ".", __LINE__, __FUNCTION__, __FILE__);
         }
         catch (const std::exception& e)
         {
@@ -219,4 +277,30 @@ namespace op
             return cv::Mat{};
         }
     }
+
+
+    int mkdirForFile(std::string filePath)
+    {
+        int index = filePath.rfind("/");
+        if(index<0){
+            return index;
+        } 
+        else{
+            mkdir(filePath.substr(0,index));
+        }
+        return index;
+         
+    }
+
+    // void getZipName(std::string filePath)
+    // {
+    //     int index = filePath.rfind("/");
+    //     if(index<0){
+    //         return;
+    //     } 
+    //     else{
+    //         mkdir(filePath.substr(0,index));
+    //     }
+    // }
+
 }

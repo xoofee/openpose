@@ -16,6 +16,8 @@ namespace op
         {
             if (!keypointVector.empty())
             {
+                // creat file
+                
                 // File path (no extension)
                 const auto fileNameNoExtension = getNextFileName(fileName) + "_" + keypointName;
 
@@ -38,4 +40,5 @@ namespace op
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
+
 }

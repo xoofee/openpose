@@ -7,6 +7,7 @@
 #include <opencv2/highgui/highgui.hpp> // CV_LOAD_IMAGE_ANYDEPTH, CV_IMWRITE_PNG_COMPRESSION
 #include <openpose/core/array.hpp>
 #include "enumClasses.hpp"
+#include <openpose/utilities/fileSystem.hpp>
 
 namespace op
 {
@@ -17,6 +18,8 @@ namespace op
 
     void saveData(const cv::Mat& cvMat, const std::string cvMatName, const std::string& fileNameNoExtension, const DataFormat format);
 
+    int mkdirForFile(std::string filePath);
+
     std::vector<cv::Mat> loadData(const std::vector<std::string>& cvMatNames, const std::string& fileNameNoExtension, const DataFormat format);
 
     cv::Mat loadData(const std::string& cvMatName, const std::string& fileNameNoExtension, const DataFormat format);
@@ -25,8 +28,8 @@ namespace op
     void savePoseJson(const Array<float>& pose, const std::string& fileName, const bool humanReadable);
 
     // Save/load image
-    void saveImage(const cv::Mat& cvMat, const std::string& fullFilePath, const std::vector<int>& openCvCompressionParams = {CV_IMWRITE_JPEG_QUALITY, 100, CV_IMWRITE_PNG_COMPRESSION, 9});
-
+    void saveImage(const cv::Mat& cvMat, const std::string& fullFilePath, std::string zipName = "img", const std::vector<int>& openCvCompressionParams = {CV_IMWRITE_JPEG_QUALITY, 100, CV_IMWRITE_PNG_COMPRESSION, 9});
+    // void saveImageZip(const std::vector<cv::Mat>& cvMat, const std::string& fullFilePath, std::string zipName = "img", const std::vector<int>& openCvCompressionParams = {CV_IMWRITE_JPEG_QUALITY, 100, CV_IMWRITE_PNG_COMPRESSION, 9});
     cv::Mat loadImage(const std::string& fullFilePath, const int openCvFlags = CV_LOAD_IMAGE_ANYDEPTH);
 }
 

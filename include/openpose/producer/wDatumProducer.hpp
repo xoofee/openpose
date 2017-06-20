@@ -58,6 +58,7 @@ namespace op
             // Profiling speed
             const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
             // Create and fill TDatums
+            // @
             const auto isRunningAndTDatums = spDatumProducer->checkIfRunningAndGetDatum();
             // Stop Worker if producer finished
             if (!isRunningAndTDatums.first)

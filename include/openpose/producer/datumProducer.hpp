@@ -68,12 +68,16 @@ namespace op
     {
         try
         {
+
+            auto datums = std::make_shared<TDatumsNoPtr>(1);
+
+
             // Check last desired frame has not been reached
             if (mNumberFramesToProcess != std::numeric_limits<unsigned long long>::max() && mGlobalCounter > mNumberFramesToProcess)
                 spProducer->release();
             // If producer released -> it sends an empty cv::Mat + a datumProducerRunning signal
             const bool datumProducerRunning = spProducer->isOpened();
-            auto datums = std::make_shared<TDatumsNoPtr>(1);
+            
             auto& datum = (*datums)[0];
             // Check producer device is open
             if (datumProducerRunning)
@@ -91,7 +95,13 @@ namespace op
                     }
                 }
                 // Get cv::Mat
-                datum.name = spProducer->getFrameName();
+                datum.prefix = spProducer->getFramePrefix();
+                if (!datum.prefix.empty()){
+                    datum.name = datum.prefix+"/"+spProducer->getFrameName();
+                }
+                else{
+                    datum.name = spProducer->getFrameName();
+                }
                 datum.cvInputData = spProducer->getFrame();
                 datum.cvOutputData = datum.cvInputData;
                 // Check frames are not empty
@@ -103,6 +113,8 @@ namespace op
             // Increase counter if successful image
             if (datums != nullptr)
                 mGlobalCounter++;
+
+
             // Return result
             return std::make_pair(datumProducerRunning, datums);
         }

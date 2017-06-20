@@ -25,7 +25,9 @@ namespace op
 
         std::string getFrameName();
 
-        inline bool isOpened() const
+        std::string getFramePrefix();
+
+        inline bool isOpened()
         {
             return (mFrameNameCounter >= 0);
         }

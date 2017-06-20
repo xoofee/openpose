@@ -8,6 +8,7 @@ namespace op
 {
     class FileSaver
     {
+
     protected:
         explicit FileSaver(const std::string& directoryPath);
 
@@ -15,8 +16,11 @@ namespace op
 
         std::string getNextFileName(const std::string& fileNameNoExtension) const;
 
+        std::string setDirectoryPath(std::string s); 
+
     private:
-        const std::string mDirectoryPath;
+        std::string mDirectoryPath;
+        std::string originDirectoryPath;
     };
 }
 

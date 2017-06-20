@@ -3,10 +3,10 @@
 #include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/producer/producer.hpp>
-
+#include <iostream>
 namespace op
 {
-    void reset(unsigned int& numberEmptyFrames, bool& trackingFps)
+    void Producer::reset(unsigned int& numberEmptyFrames, bool& trackingFps)
     {
         try
         {
@@ -39,6 +39,7 @@ namespace op
         try
         {
             cv::Mat frame;
+
 
             if (isOpened())
             {

@@ -28,7 +28,6 @@ namespace op
 
     private:
         const std::string mPathName;
-
         cv::Mat getRawFrame();
 
         DELETE_COPY(VideoReader);

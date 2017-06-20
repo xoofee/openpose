@@ -22,6 +22,8 @@ namespace op
 
         std::string name;      /**< Name used when saving the data to disk (e.g. `write_images` or `write_keypoint` flags in the demo). */
 
+        std::string prefix;
+
         // -------------------------------------------------- Input image and rendered version parameters -------------------------------------------------- //
         /**
          * Original image to be processed in cv::Mat uchar format.

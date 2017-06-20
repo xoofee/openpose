@@ -34,11 +34,12 @@ namespace op
         virtual ~VideoCaptureReader();
 
         virtual std::string getFrameName() = 0;
+        std::string getFramePrefix();
 
-        inline bool isOpened() const
-        {
-            return mVideoCapture.isOpened();
-        }
+        bool load();
+
+        bool isOpened();
+        
 
         void release();
 
@@ -58,13 +59,16 @@ namespace op
         {
             Producer::set(property, value);
         }
-
+        cv::Mat getFrame();
+        void ifEndedResetOrRelease();
     protected:
         virtual cv::Mat getRawFrame() = 0;
+        int step;
 
     private:
         cv::VideoCapture mVideoCapture;
-
+        std::vector<std::string> videoPathList;
+        int mVideoCounter;
         DELETE_COPY(VideoCaptureReader);
     };
 }

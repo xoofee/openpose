@@ -20,6 +20,7 @@ namespace op
         virtual ~NetCaffe();
 
         void initializationOnThread();
+        void reshape(const std::array<int, 4>& netInputSize4D);
 
         // Alternative a) getInputDataCpuPtr or getInputDataGpuPtr + forwardPass
         float* getInputDataCpuPtr() const;

@@ -21,5 +21,6 @@
 #include "wPoseJsonSaver.hpp"
 #include "wPoseSaver.hpp"
 #include "wVideoSaver.hpp"
-
+#include "wImageZipSaver.hpp"
+#include "wHeatMapZipSaver.hpp"
 #endif // OPENPOSE_FILESTREAM_HEADERS_HPP

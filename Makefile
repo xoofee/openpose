@@ -15,7 +15,7 @@ ifeq ($(DEBUG_BUILD_DIR),)
 	DEBUG_BUILD_DIR := .$(BUILD_DIR)_debug
 endif
 
-DEBUG ?= 0
+DEBUG ?= 1
 ifeq ($(DEBUG), 1)
 	BUILD_DIR := $(DEBUG_BUILD_DIR)
 	OTHER_BUILD_DIR := $(RELEASE_BUILD_DIR)
@@ -146,7 +146,7 @@ ifneq ($(CPU_ONLY), 1)
 endif
 
 # LIBRARIES += glog gflags boost_system boost_filesystem m hdf5_hl hdf5 caffe
-LIBRARIES += glog gflags boost_system boost_filesystem m hdf5_hl hdf5
+LIBRARIES += glog gflags boost_system boost_filesystem m hdf5_hl hdf5 zip
 
 # handle IO dependencies
 USE_LEVELDB ?= 1

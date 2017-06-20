@@ -34,7 +34,7 @@ namespace op
          * Main function of Producer, it retrieves and returns a new frame from the frames producer.
          * @return cv::Mat with the new frame. 
          */
-        cv::Mat getFrame();
+        virtual cv::Mat getFrame();
 
         /**
          * This function returns a unique frame name (e.g. the frame number for video, the
@@ -42,6 +42,7 @@ namespace op
          * @return std::string with an unique frame name.
          */
         virtual std::string getFrameName() = 0;
+        virtual std::string getFramePrefix() = 0;
 
         /**
          * This function sets whether the producer must keep the original fps frame rate or extract the frames as quick
@@ -64,7 +65,7 @@ namespace op
          * to retrieve more frames.
          * @return bool indicating whether the Producer is opened.
          */
-        virtual bool isOpened() const = 0;
+        virtual bool isOpened() = 0;
 
         /**
          * This function releases and closes the Producer. After it is called, no more frames
@@ -126,7 +127,10 @@ namespace op
          */
         virtual cv::Mat getRawFrame() = 0;
 
-    private:
+
+        void reset(unsigned int& numberEmptyFrames, bool& trackingFps);
+
+    // private:
         const ProducerType mType;
         ProducerFpsMode mProducerFpsMode;
         std::array<double, (int)ProducerProperty::Size> mProperties;

@@ -272,6 +272,7 @@ namespace op
 #include <openpose/utilities/cuda.hpp>
 #include <openpose/utilities/errorAndLog.hpp>
 #include <openpose/utilities/fileSystem.hpp>
+#include <iostream>
 namespace op
 {
     template<typename TDatums, typename TWorker, typename TQueue>
@@ -716,7 +717,9 @@ namespace op
             if (!writeImagesCleaned.empty())
             {
                 const auto imageSaver = std::make_shared<ImageSaver>(writeImagesCleaned, wrapperStructOutput.writeImagesFormat);
-                mOutputWs.emplace_back(std::make_shared<WImageSaver<TDatumsPtr>>(imageSaver));
+                // mOutputWs.emplace_back(std::make_shared<WImageSaver<TDatumsPtr>>(imageSaver));
+                // @sj
+                mOutputWs.emplace_back(std::make_shared<WImageZipSaver<TDatumsPtr>>(imageSaver));
             }
             // Write frames as *.avi video on hard disk
             if (!wrapperStructOutput.writeVideo.empty() && wrapperStructInput.producerSharedPtr != nullptr)
@@ -733,7 +736,9 @@ namespace op
             if (!writeHeatMapsCleaned.empty())
             {
                 const auto heatMapSaver = std::make_shared<HeatMapSaver>(writeHeatMapsCleaned, wrapperStructOutput.writeHeatMapsFormat);
-                mOutputWs.emplace_back(std::make_shared<WHeatMapSaver<TDatumsPtr>>(heatMapSaver));
+                // mOutputWs.emplace_back(std::make_shared<WHeatMapSaver<TDatumsPtr>>(heatMapSaver));
+                // @sj
+                mOutputWs.emplace_back(std::make_shared<WHeatMapZipSaver<TDatumsPtr>>(heatMapSaver));
             }
             // Add frame information for GUI
             // If this WGuiInfoAdder instance is placed before the WImageSaver or WVideoSaver, then the resulting recorded frames will
@@ -1030,6 +1035,7 @@ namespace op
                 if (!mOutputWs.empty())
                 {
                     mThreadManager.add(mThreadId, mOutputWs, queueIn++, queueOut++);                        // Thread 4 or 5, queues 4 -> 5
+                    std::cout<<mThreadId<<std::endl;
                     threadIdPP();
                 }
             }

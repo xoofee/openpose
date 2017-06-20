@@ -3,21 +3,36 @@
 #include <openpose/utilities/fastMath.hpp>
 #include <openpose/utilities/fileSystem.hpp>
 #include <openpose/producer/imageDirectoryReader.hpp>
-
+#include <fstream> 
+#include <iostream> 
 namespace op
 {
     std::vector<std::string> getImagePathsOnDirectory(const std::string& imageDirectoryPath)
     {
         try
-        {
+        {   
+            
             // Get files on directory with the desired extensions
             const std::vector<std::string> extensions{".bmp", ".dib", ".pbm", ".pgm", ".ppm", ".sr", ".ras",     // Completely supported by OpenCV
                                                       ".jpg", "jpeg", ".png"};                                   // Most of them supported by OpenCV
-            const auto imagePaths = getFilesOnDirectory(imageDirectoryPath, extensions);
-
+            std::vector<std::string> imagePaths;
+            if(imageDirectoryPath.substr(imageDirectoryPath.length()-3,3) == "txt"){
+                std::ifstream infile(imageDirectoryPath.c_str());
+                std::string line;
+                 while (std::getline(infile, line)) {
+                    imagePaths.push_back(line);
+                }
+            }
+            else{
+                imagePaths = getFilesOnDirectory(imageDirectoryPath, extensions);
+            }
+            
+            // std::cout<<imagePaths[0].c_str()<<std::endl;
+            
             // Check #files > 0
             if (imagePaths.empty())
                 error("No images were found on " + imageDirectoryPath, __LINE__, __FUNCTION__, __FILE__);
+
 
             return imagePaths;
         }
@@ -41,10 +56,18 @@ namespace op
         return getFileNameNoExtension(mFilePaths.at(mFrameNameCounter));
     }
 
+    std::string ImageDirectoryReader::getFramePrefix()
+    {
+
+        // mFilePaths.at(mFrameNameCounter)[]
+        return getFileNameNoExtension(mFilePaths.at(mFrameNameCounter));
+    }
+
     cv::Mat ImageDirectoryReader::getRawFrame()
     {
         try
         {
+            std::cout<<mFilePaths[0].c_str()<<std::endl;
             auto frame = loadImage(mFilePaths.at(mFrameNameCounter++).c_str(), CV_LOAD_IMAGE_COLOR);
             // Check frame integrity. This function also checks width/height changes. However, if it is performed after setWidth/setHeight this is performed over the new resolution (so they always match).
             checkFrameIntegrity(frame);

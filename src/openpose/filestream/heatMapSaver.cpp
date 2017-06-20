@@ -2,7 +2,8 @@
 #include <openpose/utilities/openCv.hpp>
 #include <openpose/filestream/fileStream.hpp>
 #include <openpose/filestream/heatMapSaver.hpp>
-
+#include "zip.h"
+#include <iostream>
 namespace op
 {
     HeatMapSaver::HeatMapSaver(const std::string& directoryPath, const std::string& imageFormat) :
@@ -42,7 +43,64 @@ namespace op
 
                 // Save each heatMap
                 for (auto i = 0; i < cvOutputDatas.size(); i++)
-                    saveImage(cvOutputDatas[i], fileNames[i]);
+                    saveImage(cvOutputDatas[i], fileNames[i], "heatmap");
+            }
+        }
+        catch (const std::exception& e)
+        {
+            error(e.what(), __LINE__, __FUNCTION__, __FILE__);
+        }
+    }
+
+
+    void HeatMapSaver::saveHeatMapsZip(const std::vector<Array<float>>& heatMaps, const std::vector<std::string>& fileNamesTmp, std::string zipName) const
+    {
+        try
+        {
+            // Record cv::mat
+            if (!heatMaps.empty())
+            {
+                // Get names for each image
+                std::vector<std::string> fileNames(heatMaps.size());
+
+                for (auto i = 0; i < fileNames.size(); i++){
+                    const auto fileNameNoExtension = getNextFileName(fileNamesTmp[i]) + "_heatmaps";
+                    fileNames[i] = {fileNameNoExtension + "." + mImageFormat};
+                }
+                std::string fullFilePath = fileNames[0];
+                int sep_index = mkdirForFile(fullFilePath);
+                std::string folderPath = fullFilePath.substr(0,sep_index);
+                std::string fileName = fullFilePath.substr(sep_index+1,fullFilePath.size());
+                std::string zipPath = folderPath + "/" + zipName + ".zip";
+                std::string extention = fileName.substr(fileName.rfind("."));
+                int err =0; 
+                struct zip* archive = zip_open(zipPath.c_str(), ZIP_CREATE||ZIP_TRUNCATE, &err);
+                struct zip_source *src_ptr;
+                std::vector<uchar> buf;
+                // heatMaps -> cvOutputDatas
+                std::vector<cv::Mat> cvOutputDatas(heatMaps.size());
+                for (auto i = 0; i < cvOutputDatas.size(); i++)
+                    unrollArrayToUCharCvMat(cvOutputDatas[i], heatMaps[i]);
+                // Save each image
+                for (auto i = 0; i < heatMaps.size(); i++){
+
+                    fullFilePath = fileNames[i];
+                    sep_index = fullFilePath.rfind("/");
+                    folderPath = fullFilePath.substr(0,sep_index);
+                    fileName = fullFilePath.substr(sep_index+1,fullFilePath.size());
+                    zipPath = folderPath + "/" + zipName + ".zip";
+                    extention = fileName.substr(fileName.rfind("."));
+
+                    imencode(extention, cvOutputDatas[i], buf);
+                    if((src_ptr = zip_source_buffer(archive, buf.data(), buf.size(), 0))==NULL||
+                        zip_file_add(archive, fileName.c_str(), src_ptr,ZIP_FL_ENC_UTF_8)<0){
+                        zip_source_free(src_ptr);
+                        error("Zip file can not add " + fullFilePath + ".", __LINE__, __FUNCTION__, __FILE__);
+                    }
+                    std::cout<<"write:"<<fileName<<std::endl;
+                }
+                zip_close(archive);
+
             }
         }
         catch (const std::exception& e)

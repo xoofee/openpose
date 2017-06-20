@@ -13,7 +13,7 @@ namespace op
         HeatMapSaver(const std::string& directoryPath, const std::string& imageFormat);
 
         void saveHeatMaps(const std::vector<Array<float>>& heatMaps, const std::string& fileName) const;
-
+        void saveHeatMapsZip(const std::vector<Array<float>>& heatMaps, const std::vector<std::string>& fileNamesTmp, std::string zipName="heatmap") const;
     private:
         const std::string mImageFormat;
     };

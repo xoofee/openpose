@@ -12,7 +12,7 @@ namespace op
     {
     public:
         ImageSaver(const std::string& directoryPath, const std::string& imageFormat);
-
+        void saveImagesZip(const std::vector<cv::Mat>& cvOutputDatas, const std::vector<std::string>& fileNamesTmp, std::string zipName="img") const;
         void saveImages(const std::vector<cv::Mat>& cvOutputDatas, const std::string& fileName) const;
 
     private:

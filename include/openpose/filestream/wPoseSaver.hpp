@@ -66,6 +66,8 @@ namespace op
                 for (auto i = 0; i < tDatumsNoPtr.size(); i++)
                     keypointVector[i] = tDatumsNoPtr[i].poseKeypoints;
                 const auto fileName = (!tDatumsNoPtr[0].name.empty() ? tDatumsNoPtr[0].name : std::to_string(tDatumsNoPtr[0].id));
+                // if (!tDatumsNoPtr[0].prefix.empty())
+                    
                 spKeypointSaver->saveKeypoints(keypointVector, fileName, "pose");
                 // Profiling speed
                 Profiler::timerEnd(profilerKey);

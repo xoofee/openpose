@@ -20,11 +20,27 @@ namespace op
     NetCaffe::~NetCaffe()
     {
     }
+    
+    // void NetCaffe::reshape(const std::array<int, 4>& netInputSize4D){
+    //     if(netInputSize4D[0]!=mNetInputSize4D[0]||
+    //     netInputSize4D[1]!=mNetInputSize4D[1]||
+    //     netInputSize4D[2]!=mNetInputSize4D[2]||
+    //     netInputSize4D[3]!=mNetInputSize4D[3]){
+    //         mNetInputSize4D[0] = netInputSize4D[0];
+    //         mNetInputSize4D[1] = netInputSize4D[1];
+    //         mNetInputSize4D[2] = netInputSize4D[2];
+    //         mNetInputSize4D[3] = netInputSize4D[3];
+    //         mNetInputMemory = std::accumulate(mNetInputSize4D.begin(), mNetInputSize4D.end(), 1, std::multiplies<int>()) * sizeof(float);
+    //         upCaffeNet->blobs()[0]->Reshape({mNetInputSize4D[0], mNetInputSize4D[1], mNetInputSize4D[2], mNetInputSize4D[3]});
+    //         upCaffeNet->Reshape();
+    //         std::cout<<"Reshape"<<std::endl;
+    //     }
+    // }
 
     void NetCaffe::initializationOnThread()
     {
         try
-        {
+        {   
             // Initialize net
             caffe::Caffe::set_mode(caffe::Caffe::GPU);
             caffe::Caffe::SetDevice(mGpuId);
