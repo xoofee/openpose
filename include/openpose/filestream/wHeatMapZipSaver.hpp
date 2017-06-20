@@ -22,7 +22,7 @@ namespace op
 
     private:
         std::priority_queue<TDatums, std::vector<TDatums>, PointerContainerGreater<TDatums>> mPriorityQueueBuffer;
-        std::vector<Array<float>> poseHeatMapBuffer;
+        std::vector<cv::Mat> poseHeatMapBuffer;
         std::vector<std::string> fileNamesBuffer;
         // int bufferCount;
 
@@ -42,6 +42,7 @@ namespace op
 #include <openpose/utilities/macros.hpp>
 #include <openpose/utilities/pointerContainer.hpp>
 #include <openpose/utilities/profiler.hpp>
+#include <openpose/utilities/openCv.hpp>
 namespace op
 {
     template<typename TDatums>
@@ -83,7 +84,9 @@ namespace op
                 if(lastPrefix.empty() || lastPrefix == tDatumsNoPtr[0].prefix){
                     lastPrefix = tDatumsNoPtr[0].prefix;
                     auto& tDatumsPtr = *tDatums;
-                    poseHeatMapBuffer.push_back(tDatumsPtr[0].poseHeatMaps);
+                    cv::Mat heapmapImage;
+                    unrollArrayToUCharCvMat(heapmapImage, tDatumsPtr[0].poseHeatMaps);
+                    poseHeatMapBuffer.push_back(heapmapImage);
                     fileNamesBuffer.push_back(!tDatumsPtr[0].name.empty() ? tDatumsPtr[0].name : std::to_string(tDatumsPtr[0].id));
 
                     // mPriorityQueueBuffer.emplace(tDatums);
@@ -91,7 +94,7 @@ namespace op
                 else if(lastPrefix != tDatumsNoPtr[0].prefix){
                     spHeatMapSaver->saveHeatMapsZip(poseHeatMapBuffer, fileNamesBuffer);
                     for(int i = 0; i<poseHeatMapBuffer.size();i++){
-                       poseHeatMapBuffer[i].reset(0);
+                       poseHeatMapBuffer[i].release();
                     }
                     poseHeatMapBuffer.clear();
                     fileNamesBuffer.clear();
