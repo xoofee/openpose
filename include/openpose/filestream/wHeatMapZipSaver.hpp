@@ -21,10 +21,9 @@ namespace op
         void workConsumer(const TDatums& tDatums);
 
     private:
-        std::priority_queue<TDatums, std::vector<TDatums>, PointerContainerGreater<TDatums>> mPriorityQueueBuffer;
         std::vector<cv::Mat> poseHeatMapBuffer;
         std::vector<std::string> fileNamesBuffer;
-        // int bufferCount;
+
 
         const std::shared_ptr<HeatMapSaver> spHeatMapSaver;
         std::string lastPrefix;
@@ -72,25 +71,15 @@ namespace op
                 dLog("", Priority::Low, __LINE__, __FUNCTION__, __FILE__);
                 // Profiling speed
                 const auto profilerKey = Profiler::timerInit(__LINE__, __FUNCTION__, __FILE__);
-                // // T* to T
-                // auto& tDatumsNoPtr = *tDatums;
-                // // Record image(s) on disk
-                // std::vector<Array<float>> poseHeatMaps(tDatumsNoPtr.size());
-                // for (auto i = 0; i < tDatumsNoPtr.size(); i++)
-                //     poseHeatMaps[i] = tDatumsNoPtr[i].poseHeatMaps;
-                // const auto fileName = (!tDatumsNoPtr[0].name.empty() ? tDatumsNoPtr[0].name : std::to_string(tDatumsNoPtr[0].id));
-                // spHeatMapSaver->saveHeatMaps(poseHeatMaps, fileName);
+
                 auto& tDatumsNoPtr = *tDatums;
                 if(lastPrefix.empty() || lastPrefix == tDatumsNoPtr[0].prefix){
                     lastPrefix = tDatumsNoPtr[0].prefix;
                     auto& tDatumsPtr = *tDatums;
                     cv::Mat heapmapImage;
-                    Array<float> a = tDatumsPtr[0].poseHeatMaps;
-                    unrollArrayToUCharCvMat(heapmapImage, a);
-                    poseHeatMapBuffer.push_back(heapmapImage.clone());
+                    unrollArrayToUCharCvMat(heapmapImage, tDatumsPtr[0].poseHeatMaps);
+                    poseHeatMapBuffer.push_back(heapmapImage);
                     fileNamesBuffer.push_back(!tDatumsPtr[0].name.empty() ? tDatumsPtr[0].name : std::to_string(tDatumsPtr[0].id));
-
-                    // mPriorityQueueBuffer.emplace(tDatums);
                 }
                 else if(lastPrefix != tDatumsNoPtr[0].prefix){
                     spHeatMapSaver->saveHeatMapsZip(poseHeatMapBuffer, fileNamesBuffer);
@@ -102,39 +91,7 @@ namespace op
 
 
                     lastPrefix = tDatumsNoPtr[0].prefix;
-                    mPriorityQueueBuffer.emplace(tDatums);
                 }
-                // else if(lastPrefix != tDatumsNoPtr[0].prefix){
-                //     // std::vector<cv::Mat> cvOutputDatas(mPriorityQueueBuffer.size());
-                //     std::vector<Array<float>> poseHeatMaps(tDatumsNoPtr.size());
-                //     std::vector<std::string> fileNames(mPriorityQueueBuffer.size());
-                //     int i = 0;
-                    
-                //     while (!mPriorityQueueBuffer.empty()){
-                //         int d=20;
-                //         std::cout<<d++<<std::endl;
-                //         auto& tDatumsPtr = *mPriorityQueueBuffer.top();
-                //         std::cout<<d++<<std::endl;
-                //         fileNames[i] = (!tDatumsPtr[0].name.empty() ? tDatumsPtr[0].name : std::to_string(tDatumsPtr[0].id));
-                //         std::cout<<d++<<std::endl;
-                //         poseHeatMaps[i] = tDatumsPtr[0].poseHeatMaps;//？
-                //         i++;
-
-                //         // spImageSaver->saveImages(cvOutputDatas, fileName);
-
-                //         // std::cout<<"write:"<<fileName<<std::endl;
-                //         std::cout<<d++<<std::endl;
-                //         mPriorityQueueBuffer.pop();
-                //         std::cout<<d++<<std::endl;
-                //     }
-                //     spHeatMapSaver->saveHeatMapsZip(poseHeatMaps, fileNames);
-
-                //     lastPrefix = tDatumsNoPtr[0].prefix;
-                //     mPriorityQueueBuffer.emplace(tDatums);
-                // }
-
-
-
 
 
                 // Profiling speed
@@ -150,6 +107,8 @@ namespace op
             error(e.what(), __LINE__, __FUNCTION__, __FILE__);
         }
     }
+
+
 
     COMPILE_TEMPLATE_DATUM(WHeatMapZipSaver);
 }
