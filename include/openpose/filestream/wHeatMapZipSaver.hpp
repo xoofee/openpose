@@ -85,8 +85,9 @@ namespace op
                     lastPrefix = tDatumsNoPtr[0].prefix;
                     auto& tDatumsPtr = *tDatums;
                     cv::Mat heapmapImage;
-                    unrollArrayToUCharCvMat(heapmapImage, tDatumsPtr[0].poseHeatMaps);
-                    poseHeatMapBuffer.push_back(heapmapImage);
+                    Array<float> a = tDatumsPtr[0].poseHeatMaps;
+                    unrollArrayToUCharCvMat(heapmapImage, a);
+                    poseHeatMapBuffer.push_back(heapmapImage.clone());
                     fileNamesBuffer.push_back(!tDatumsPtr[0].name.empty() ? tDatumsPtr[0].name : std::to_string(tDatumsPtr[0].id));
 
                     // mPriorityQueueBuffer.emplace(tDatums);
