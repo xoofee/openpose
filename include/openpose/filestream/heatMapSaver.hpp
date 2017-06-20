@@ -14,6 +14,7 @@ namespace op
 
         void saveHeatMaps(const std::vector<Array<float>>& heatMaps, const std::string& fileName) const;
         void saveHeatMapsZip(const std::vector<Array<float>>& heatMaps, const std::vector<std::string>& fileNamesTmp, std::string zipName="heatmap") const;
+        void saveHeatMapsZip(const std::vector<cv::Mat>& cvOutputDatas, const std::vector<std::string>& fileNamesTmp, std::string zipName="heatmap") const;
     private:
         const std::string mImageFormat;
     };

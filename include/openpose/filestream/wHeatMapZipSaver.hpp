@@ -90,6 +90,9 @@ namespace op
                 }
                 else if(lastPrefix != tDatumsNoPtr[0].prefix){
                     spHeatMapSaver->saveHeatMapsZip(poseHeatMapBuffer, fileNamesBuffer);
+                    for(int i = 0; i<poseHeatMapBuffer.size();i++){
+                       poseHeatMapBuffer[i].reset(0);
+                    }
                     poseHeatMapBuffer.clear();
                     fileNamesBuffer.clear();
 
