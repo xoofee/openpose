@@ -12,7 +12,7 @@ namespace op
         Producer{ProducerType::Webcam},
         mVideoCapture{index}
     {
-        step = 5;
+        step = 1;
         try
         {
             // assert: make sure video capture was opened
@@ -28,7 +28,7 @@ namespace op
     VideoCaptureReader::VideoCaptureReader(const std::string& path) :
         Producer{ProducerType::Video}
     {
-        step = 5;
+        step = 1;
         mVideoCounter = 0;
         if(path.substr(path.length()-3,3) == "txt"){
             std::ifstream infile(path.c_str());
